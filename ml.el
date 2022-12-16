@@ -56,20 +56,33 @@
   :bind ("M-/" . company-complete)
   :config (setq company-idle-delay nil))
 
+;; Needed for php.
+(use-package yasnippet)
+
 ;; php formatting.
 (use-package php-mode)
+(use-package phpactor :ensure t)
+(use-package company-phpactor :ensure t)
 (add-hook 'php-mode-hook 'lsp)
+;; (phpactor-install-or-update)
 
 ;; Dockerfile formatting.
 (use-package dockerfile-mode)
 (add-hook 'dockerfile-mode-hook 'lsp)
 (add-to-list 'auto-mode-alist '("Dockerfile-[a-zA-Z]*" . dockerfile-mode))
 
-;; I don't know if I'm doing this or not. Maybe.
-;; (use-package typescript-mode)
-;; Typescript should only be indented to 2.
-(setq typescript-indent-level 2)
+;; Typescript mode.
+(use-package typescript-mode
+  ;; Typescript should only be indented to 2.
+  :config (setq typescript-indent-level 2)
+  ;; Typescript on .tsx files.
+  (add-to-list 'auto-mode-alist '("\\.tsx\\'" . typescript-mode)))
 
+;; Json should only use 2 spaces for indenting.
+(add-hook 'json-mode-hook
+          (lambda ()
+            (make-local-variable 'js-indent-level)
+            (setq js-indent-level 2)))
 ;; Non-functional attempt to make this prompt for something to jump to definition of.
 (global-set-key (kbd "C-.") 'xref-find-apropos)
 
@@ -84,6 +97,7 @@
 
 ;; Jenkinsfiles should look nice.
 (use-package jenkinsfile-mode)
+(use-package groovy-mode)
 
 ;; So should yaml/yml files.
 (use-package yaml-mode)
@@ -100,11 +114,15 @@
 ;; Display tabs in red.
 (setq whitespace-style '(face trailing tabs))
 (custom-set-faces
+ ;; custom-set-faces was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
  '(whitespace-tab ((t (:background "red")))))
-(global-whitespace-mode)
-
 ;; Show extra whitespace that'll get deleted.
 (setq-default show-trailing-whitespace t)
+(add-hook 'prog-mode-hook 'whitespace-mode)
+;;           '(whitespace-mode 1))
 
 
 ;; ;; Tree sitter (which should be built into emacs in the next full version) supports syntax highlighting, etc.,
@@ -169,9 +187,9 @@
   (defun string-inflection-mark-style-function (str)
     "foo_bar => fooBar => foo_bar"
     (cond ((string-inflection-underscore-p str)
-	   (string-inflection-camelcase-function str))
-	  (t
-	   (string-inflection-underscore-function str))))
+           (string-inflection-camelcase-function str))
+          (t
+           (string-inflection-underscore-function str))))
   (defun string-inflection-mark-style-cycle ()
     "foo_bar => fooBar => foo_bar"
     (interactive)
@@ -187,8 +205,66 @@
   (setq dired-use-ls-dired nil))
 
 ;; Uneditable command prompt to prevent accidental deletions.
-;; Still need to set up zsh as my shell(s). Probably when I get a 2nd monitor.
 (setq comint-prompt-read-only t)
+
+(use-package vterm
+  :ensure t)
+
+(defun my-comint-init ()
+  "Fix shell echoing."
+  (setq comint-process-echoes t))
+(add-hook 'comint-mode-hook 'my-comint-init)
+
+;; Commands for the named shells. C-f 8-10 to access.
+(defun start-named-shell (buffer-name)
+  "Create a new shell with the specified BUFFER-NAME."
+  (cond ((not (get-buffer buffer-name))
+         (vterm)
+         ;; (make-local-variable 'comint-completion-addsuffix)
+         ;; (setq comint-completion-addsuffix (quote ("\\" . " ")))
+         ;; (setq tab-width 4)
+         ;; (setq comint-input-ring-size 100)
+         ;; (setq comint-input-ignoredups t)
+         ;; (setq comint-process-echoes t)
+         (rename-buffer buffer-name))
+        ;; if the buffer we want is in the current window, move to
+        ;; the end
+        ((equal (buffer-name) buffer-name)
+         (if (not (equal (point) (point-max)))
+             (goto-char (point-max))))
+        ;; if the buffer is in another window in the current frame,
+        ;; switch to it
+        ((get-buffer-window buffer-name)
+         (select-window (get-buffer-window buffer-name)))
+        ;; if the buffer is in a window in another visible frame,
+        ;; set the input focus to the proper frame and window
+        ((get-buffer-window buffer-name 'visible)
+         (select-frame-set-input-focus
+          (window-frame (get-buffer-window buffer-name 'visible)))
+         (select-window (get-buffer-window buffer-name 'visible)))
+        ;; the buffer is not in any currently visible frame, display
+        ;; it in the current window
+        (t
+         (switch-to-buffer buffer-name))))
+
+(defun zsh1 ()
+  "Create shell named zsh1."
+  (interactive)
+  (start-named-shell "zsh1"))
+
+(defun zsh2 ()
+  "Create shell named zsh2."
+  (interactive)
+  (start-named-shell "zsh2"))
+
+(defun zsh3 ()
+  "Create shell named zsh3."
+  (interactive)
+  (start-named-shell "zsh3"))
+
+(global-set-key (kbd "C-8") 'zsh1)
+(global-set-key (kbd "C-9") 'zsh2)
+(global-set-key (kbd "C-0") 'zsh3)
 
 ;; Shift + arrow to scroll up/down.
 (global-set-key (kbd "S-<up>") (kbd "C-u 1 C-v"))
@@ -206,10 +282,6 @@
 ;; Always highlight the current line. In a visible color.
 (global-hl-line-mode t)
 (set-face-background hl-line-face "gray30")
-
-;; Start with 2 windows, split left-right, and balanced.
-(split-window-right)
-(balance-windows)
 
 ;; Projectile is for finding files in a project/managing projects.
 (use-package projectile)
@@ -251,6 +323,23 @@
   (save-some-buffers (not arg)))
 (global-set-key (kbd "<f3>") 'save-all-buffers)
 
+;; Start with 3 windows, split left-right, and balanced.
+(split-window-right)
+(split-window-right)
+(balance-windows)
+;; Then double it.
+(make-frame)
+(split-window-right)
+(split-window-right)
+(balance-windows)
+;; And give those new ones shells.
+(zsh1)
+(other-window 1)
+(zsh2)
+(other-window 1)
+(zsh3)
+(other-window 1)
+
 ;; TODO: Git integration.
 ;; TODO: Shell setup. (Likely wait for a second monitor.)
 ;; TODO: org-mode my life!
@@ -263,11 +352,5 @@
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
  '(package-selected-packages
-   '(projectile-ripgrep string-inflection dockerfile-mode php-mode rainbow-delimiters rainbow-delimeters company ido-at-point ggtags lsp-ui jenkinsfile-mode flycheck iedit iedit-mode smartscan ido-vertical-mode projectile zeno-theme use-package typescript-mode tree-sitter-langs spacemacs-theme move-text melancholy-theme lsp-mode highlight-indent-guides exotica-theme))
+   '(vterm yasnippet company-phpactor phpactor projectile-ripgrep string-inflection dockerfile-mode php-mode rainbow-delimiters rainbow-delimeters company ido-at-point ggtags lsp-ui jenkinsfile-mode flycheck iedit iedit-mode smartscan ido-vertical-mode projectile zeno-theme use-package typescript-mode tree-sitter-langs spacemacs-theme move-text melancholy-theme lsp-mode highlight-indent-guides exotica-theme))
  '(warning-suppress-types '((lsp-mode))))
-(custom-set-faces
- ;; custom-set-faces was added by Custom.
- ;; If you edit it by hand, you could mess it up, so be careful.
- ;; Your init file should contain only one such instance.
- ;; If there is more than one, they won't work right.
- )
