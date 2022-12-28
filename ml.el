@@ -20,6 +20,12 @@
 ;; Allow 'y' or 'n' for any confirm messages instead of 'yes' and 'no'.
 (defalias 'yes-or-no-p 'y-or-n-p)
 
+;; When reopening a file, go to where I was before.
+(save-place-mode 1)
+
+;; Automatically update files when they update on disk (git merge, etc.).
+(global-auto-revert-mode 1)
+
 ;; Theme
 (use-package exotica-theme
   :config (load-theme 'exotica t))
@@ -55,6 +61,10 @@
 (use-package company
   :bind ("M-/" . company-complete)
   :config (setq company-idle-delay nil))
+
+;; Rust formatting.
+(use-package rust-mode)
+(add-hook 'rust-mode-hook 'lsp)
 
 ;; Needed for php.
 (use-package yasnippet)
@@ -95,6 +105,15 @@
 (global-set-key (kbd "M-\"") 'insert-pair)
 (global-set-key (kbd "M-'") 'insert-pair)
 
+(use-package multiple-cursors
+  :config
+  ;; When you have an active region that spans multiple lines, the following will add a cursor to each line:
+  (global-set-key (kbd "C-S-c C-S-c") 'mc/edit-lines)
+  ;; When you want to add multiple cursors not based on continuous lines, but based on keywords in the buffer, use:
+  (global-set-key (kbd "C->") 'mc/mark-next-like-this)
+  (global-set-key (kbd "C-<") 'mc/mark-previous-like-this)
+)
+
 ;; Jenkinsfiles should look nice.
 (use-package jenkinsfile-mode)
 (use-package groovy-mode)
@@ -122,7 +141,6 @@
 ;; Show extra whitespace that'll get deleted.
 (setq-default show-trailing-whitespace t)
 (add-hook 'prog-mode-hook 'whitespace-mode)
-;;           '(whitespace-mode 1))
 
 
 ;; ;; Tree sitter (which should be built into emacs in the next full version) supports syntax highlighting, etc.,
@@ -144,14 +162,14 @@
 (add-hook 'prog-mode-hook #'hs-minor-mode)
 ;; (add-hook 'yaml-mode-hook #'hs-minor-mode) ;; It doesn't work in yaml mode. :(
 (add-hook 'hs-minor-mode-hook
-	  '(lambda ()
-	     ;; Blocks of code.
-	     (define-key hs-minor-mode-map (kbd "S-<left>") 'hs-hide-block)
-	     (define-key hs-minor-mode-map (kbd "S-<right>") 'hs-show-block)
-	     ;; Collapse up to current level.
-	     (define-key hs-minor-mode-map (kbd "C-S-<left>") 'hs-hide-level)
-	     ;; Expand all.
-	     (define-key hs-minor-mode-map (kbd "C-S-<right>") 'hs-show-all)))
+          '(lambda ()
+             ;; Blocks of code.
+             (define-key hs-minor-mode-map (kbd "S-<left>") 'hs-hide-block)
+             (define-key hs-minor-mode-map (kbd "S-<right>") 'hs-show-block)
+             ;; Collapse up to current level.
+             (define-key hs-minor-mode-map (kbd "C-S-<left>") 'hs-hide-level)
+             ;; Expand all.
+             (define-key hs-minor-mode-map (kbd "C-S-<right>") 'hs-show-all)))
 
 ;; Same for highlighting indents.
 (use-package highlight-indent-guides)
@@ -170,6 +188,7 @@
 
 ;; Moving between windows/buffers.
 (global-set-key (kbd "C-'") 'other-window)
+(global-set-key (kbd "C-<tab>") 'ns-next-frame)
 (global-set-key (kbd "<f8>") 'list-buffers)
 
 ;; Fast access to kill buffer.
@@ -208,7 +227,13 @@
 (setq comint-prompt-read-only t)
 
 (use-package vterm
-  :ensure t)
+  :ensure t
+  :config
+  (defun turn-off-chrome ()
+    (setq-local global-hl-line-mode nil)
+    (display-line-numbers-mode -1)
+    (setq show-trailing-whitespace nil))
+  :hook (vterm-mode . turn-off-chrome))
 
 (defun my-comint-init ()
   "Fix shell echoing."
@@ -247,24 +272,24 @@
         (t
          (switch-to-buffer buffer-name))))
 
-(defun zsh1 ()
-  "Create shell named zsh1."
+(defun vterm1 ()
+  "Create shell named vterm1."
   (interactive)
-  (start-named-shell "zsh1"))
+  (start-named-shell "vterm1"))
 
-(defun zsh2 ()
-  "Create shell named zsh2."
+(defun vterm2 ()
+  "Create shell named vterm2."
   (interactive)
-  (start-named-shell "zsh2"))
+  (start-named-shell "vterm2"))
 
-(defun zsh3 ()
-  "Create shell named zsh3."
+(defun vterm3 ()
+  "Create shell named vterm3."
   (interactive)
-  (start-named-shell "zsh3"))
+  (start-named-shell "vterm3"))
 
-(global-set-key (kbd "C-8") 'zsh1)
-(global-set-key (kbd "C-9") 'zsh2)
-(global-set-key (kbd "C-0") 'zsh3)
+(global-set-key (kbd "C-8") 'vterm1)
+(global-set-key (kbd "C-9") 'vterm2)
+(global-set-key (kbd "C-0") 'vterm3)
 
 ;; Shift + arrow to scroll up/down.
 (global-set-key (kbd "S-<up>") (kbd "C-u 1 C-v"))
@@ -294,6 +319,9 @@
 (projectile-discover-projects-in-search-path)
 ;; This opens project picker automatically, but gets annoying.
 ;; (projectile-switch-project)
+
+;; Magit runs all the git stuffs.
+(use-package magit)
 
 ;; Function to run npm lint on save. NOT TESTED/USED YET.
 ;; Martin recommends just using a pre-commit hook instead.
@@ -333,11 +361,11 @@
 (split-window-right)
 (balance-windows)
 ;; And give those new ones shells.
-(zsh1)
+(vterm1)
 (other-window 1)
-(zsh2)
+(vterm2)
 (other-window 1)
-(zsh3)
+( vterm3)
 (other-window 1)
 
 ;; TODO: Git integration.
@@ -352,5 +380,5 @@
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
  '(package-selected-packages
-   '(vterm yasnippet company-phpactor phpactor projectile-ripgrep string-inflection dockerfile-mode php-mode rainbow-delimiters rainbow-delimeters company ido-at-point ggtags lsp-ui jenkinsfile-mode flycheck iedit iedit-mode smartscan ido-vertical-mode projectile zeno-theme use-package typescript-mode tree-sitter-langs spacemacs-theme move-text melancholy-theme lsp-mode highlight-indent-guides exotica-theme))
+   '(multiple-cursors rust-mode magit vterm yasnippet company-phpactor phpactor projectile-ripgrep string-inflection dockerfile-mode php-mode rainbow-delimiters rainbow-delimeters company ido-at-point ggtags lsp-ui jenkinsfile-mode flycheck iedit iedit-mode smartscan ido-vertical-mode projectile zeno-theme use-package typescript-mode tree-sitter-langs spacemacs-theme move-text melancholy-theme lsp-mode highlight-indent-guides exotica-theme))
  '(warning-suppress-types '((lsp-mode))))
