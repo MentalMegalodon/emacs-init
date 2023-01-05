@@ -368,10 +368,16 @@
 ( vterm3)
 (other-window 1)
 
+(defun highlight-old-years ()
+  "Highlight years before 2023."
+  (highlight-regexp "201[0-9]")
+  (highlight-regexp "202[0-2]"))
+(add-hook 'find-file-hook #'highlight-old-years)
+
+;; 2010 2011 2020 2021 2022 2023 2024 2030
+
 ;; TODO: Git integration.
-;; TODO: Shell setup. (Likely wait for a second monitor.)
 ;; TODO: org-mode my life!
-;; TODO: Put this file on github.
 
 ;; Emacs does this. Don't mess with it.
 (custom-set-variables
