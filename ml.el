@@ -89,11 +89,12 @@
   ;; Typescript on .tsx files.
   (add-to-list 'auto-mode-alist '("\\.tsx\\'" . typescript-mode)))
 
-;; Json should only use 2 spaces for indenting.
+;; Json should only use 4? spaces for indenting.
+(use-package json-mode)
 (add-hook 'json-mode-hook
           (lambda ()
             (make-local-variable 'js-indent-level)
-            (setq js-indent-level 2)))
+            (setq js-indent-level 4)))
 ;; Non-functional attempt to make this prompt for something to jump to definition of.
 (global-set-key (kbd "C-.") 'xref-find-apropos)
 
@@ -323,9 +324,6 @@
 (projectile-discover-projects-in-search-path)
 ;; This opens project picker automatically, but gets annoying.
 ;; (projectile-switch-project)
-
-;; Magit runs all the git stuffs.
-(use-package magit)
 
 ;; This allows generating uuids for new projects.
 (use-package uuidgen)
