@@ -71,8 +71,9 @@
 
 ;; php formatting.
 (use-package php-mode)
-(use-package phpactor :ensure t)
-(use-package company-phpactor :ensure t)
+;; Phpactor not found. I couldn't resolve this error.
+;; (use-package phpactor :ensure t)
+;; (use-package company-phpactor :ensure t)
 (add-hook 'php-mode-hook 'lsp)
 ;; (phpactor-install-or-update)
 
@@ -104,6 +105,9 @@
 (global-set-key (kbd "M-{") 'insert-pair)
 (global-set-key (kbd "M-\"") 'insert-pair)
 (global-set-key (kbd "M-'") 'insert-pair)
+
+;; Better buffer management
+(global-set-key (kbd "<f8>") 'ibuffer)
 
 (use-package multiple-cursors
   :config
@@ -323,6 +327,9 @@
 ;; Magit runs all the git stuffs.
 (use-package magit)
 
+;; This allows generating uuids for new projects.
+(use-package uuidgen)
+
 ;; Function to run npm lint on save. NOT TESTED/USED YET.
 ;; Martin recommends just using a pre-commit hook instead.
 (defun npm-lint-fix ()
@@ -386,5 +393,4 @@
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
  '(package-selected-packages
-   '(multiple-cursors rust-mode magit vterm yasnippet company-phpactor phpactor projectile-ripgrep string-inflection dockerfile-mode php-mode rainbow-delimiters rainbow-delimeters company ido-at-point ggtags lsp-ui jenkinsfile-mode flycheck iedit iedit-mode smartscan ido-vertical-mode projectile zeno-theme use-package typescript-mode tree-sitter-langs spacemacs-theme move-text melancholy-theme lsp-mode highlight-indent-guides exotica-theme))
- '(warning-suppress-types '((lsp-mode))))
+   '(uuidgen magit projectile-ripgrep projectile flycheck vterm iedit string-inflection move-text highlight-indent-guides yaml-mode jenkinsfile-mode multiple-cursors typescript-mode dockerfile-mode company-phpactor phpactor php-mode yasnippet rust-mode company lsp-ui lsp-mode ido-vertical-mode rainbow-delimiters exotica-theme use-package)))
