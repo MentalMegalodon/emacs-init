@@ -107,9 +107,6 @@
 (global-set-key (kbd "M-\"") 'insert-pair)
 (global-set-key (kbd "M-'") 'insert-pair)
 
-;; Better buffer management
-(global-set-key (kbd "<f8>") 'ibuffer)
-
 (use-package multiple-cursors
   :config
   ;; When you have an active region that spans multiple lines, the following will add a cursor to each line:
@@ -194,7 +191,7 @@
 ;; Moving between windows/buffers.
 (global-set-key (kbd "C-'") 'other-window)
 (global-set-key (kbd "C-<tab>") 'ns-next-frame)
-(global-set-key (kbd "<f8>") 'list-buffers)
+(global-set-key (kbd "<f8>") 'ibuffer)
 
 ;; Fast access to kill buffer.
 (global-set-key (kbd "<f4>") 'kill-buffer)
@@ -223,6 +220,9 @@
 
 ;; Enables C-; binding to jump around to symbols and refactor a file.
 (use-package iedit)
+
+;; Does git shit.
+(use-package magit)
 
 ;; Tell mac OS to shut up about ls dired not working.
 (when (string= system-type "darwin")
@@ -383,6 +383,11 @@
   (highlight-regexp "201[0-9]")
   (highlight-regexp "202[0-2]"))
 (add-hook 'find-file-hook #'highlight-old-years)
+
+(defun highlight-todo ()
+  "Highlight comments that include TODO:."
+  (highlight-regexp "TODO:"))
+(add-hook 'find-file-hook #'highlight-todo)
 
 ;; 2010 2011 2020 2021 2022 2023 2024 2030
 
