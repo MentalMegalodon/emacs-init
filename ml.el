@@ -37,6 +37,11 @@
 (use-package rainbow-delimiters)
 (add-hook 'prog-mode-hook #'rainbow-delimiters-mode)
 
+;; Automatic pairing of parens and brackets.
+(electric-pair-mode t)
+;; Give two newlines between bracket pairs with enter.
+(setq electric-pair-open-newline-between-pairs t)
+
 ;; Smart matching for opening files/directories.
 (use-package ido)
 (setq ido-enable-flex-matching t)
@@ -391,7 +396,6 @@
 
 ;; 2010 2011 2020 2021 2022 2023 2024 2030
 
-;; TODO: Git integration.
 ;; TODO: org-mode my life!
 
 ;; Emacs does this. Don't mess with it.
