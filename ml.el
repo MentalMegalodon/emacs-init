@@ -17,6 +17,7 @@
 (tool-bar-mode -1)
 (menu-bar-mode -1)
 (scroll-bar-mode -1)
+
 ;; Allow 'y' or 'n' for any confirm messages instead of 'yes' and 'no'.
 (defalias 'yes-or-no-p 'y-or-n-p)
 
@@ -149,6 +150,9 @@
 (setq-default show-trailing-whitespace t)
 (add-hook 'prog-mode-hook 'whitespace-mode)
 
+;; My shoddy attempt at indent and dedent a block of code.
+;; (global-set-key (kbd "C-{") 'indent-rigidly)
+;; (global-set-key (kbd "C-}") (lambda () (interactive) (indent-rigidly -4)))
 
 ;; ;; Tree sitter (which should be built into emacs in the next full version) supports syntax highlighting, etc.,
 ;; ;; for most programming languages.
@@ -194,6 +198,7 @@
 (global-set-key (kbd "M-<down>") 'forward-paragraph)
 
 ;; Moving between windows/buffers.
+(global-set-key (kbd "C-'") nil)
 (global-set-key (kbd "C-'") 'other-window)
 (global-set-key (kbd "C-<tab>") 'ns-next-frame)
 (global-set-key (kbd "<f8>") 'ibuffer)
@@ -396,7 +401,19 @@
 
 ;; 2010 2011 2020 2021 2022 2023 2024 2030
 
-;; TODO: org-mode my life!
+;; Org mode and org roam config.
+;; Org roam is a package for linking org files into a wiki.
+(use-package org-roam
+  :custom
+  (org-roam-completion-everywhere t)
+  :bind (("C-c n l" . org-roam-buffer-toggle)
+         ("C-c n f" . org-roam-node-find)
+         ("C-c n i" . org-roam-node-insert)
+         :map org-mode-map
+         ("M-/"     . completion-at-point)
+         ("C-'"     . other-window)))
+(setq org-roam-directory "~/org-roam")
+(org-roam-db-autosync-mode)
 
 ;; Emacs does this. Don't mess with it.
 (custom-set-variables
@@ -405,4 +422,4 @@
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
  '(package-selected-packages
-   '(exec-path-from-shell uuidgen magit projectile-ripgrep projectile flycheck vterm iedit string-inflection move-text highlight-indent-guides yaml-mode jenkinsfile-mode multiple-cursors typescript-mode dockerfile-mode company-phpactor phpactor php-mode yasnippet rust-mode company lsp-ui lsp-mode ido-vertical-mode rainbow-delimiters exotica-theme use-package)))
+   '(org-roam exec-path-from-shell uuidgen magit projectile-ripgrep projectile flycheck vterm iedit string-inflection move-text highlight-indent-guides yaml-mode jenkinsfile-mode multiple-cursors typescript-mode dockerfile-mode company-phpactor phpactor php-mode yasnippet rust-mode company lsp-ui lsp-mode ido-vertical-mode rainbow-delimiters exotica-theme use-package)))
