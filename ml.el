@@ -200,6 +200,11 @@
 ;; Moving between windows/buffers.
 ;; (global-set-key (kbd "C-'") nil)
 (global-set-key (kbd "C-'") 'other-window)
+(defun prev-window ()
+  "The reverse of 'other-window', go back one window."
+  (interactive)
+  (other-window -1))
+(global-set-key (kbd "C-\"") 'prev-window)
 (global-set-key (kbd "C-<tab>") 'ns-next-frame)
 (global-set-key (kbd "<f8>") 'ibuffer)
 

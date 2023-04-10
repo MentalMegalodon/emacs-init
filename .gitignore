@@ -17,3 +17,4 @@ straight
 .org-id-locations
 bookmarks
 org-roam.db
+flycheck_ml.el
