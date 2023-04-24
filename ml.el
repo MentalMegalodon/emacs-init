@@ -1,4 +1,9 @@
-;; Define and initialise package repositories
+;; package --- Define and initialise package repositories
+
+;;; Commentary:
+;; This is my Emacs config.
+
+;;; Code:
 (require 'package)
 (add-to-list 'package-archives '("melpa" . "https://melpa.org/packages/") t)
 (package-initialize)
@@ -101,7 +106,8 @@
           (lambda ()
             (make-local-variable 'js-indent-level)
             (setq js-indent-level 4)))
-;; Non-functional attempt to make this prompt for something to jump to definition of.
+;; Non-functional attempt to make this prompt
+;; for something to jump to definition of.
 (global-set-key (kbd "C-.") 'xref-find-apropos)
 
 ;; Set M-, to pop global mark, not just definition-jumping marks.
@@ -115,9 +121,11 @@
 
 (use-package multiple-cursors
   :config
-  ;; When you have an active region that spans multiple lines, the following will add a cursor to each line:
+  ;; When you have an active region that spans multiple lines,
+  ;; the following will add a cursor to each line:
   (global-set-key (kbd "C-S-c C-S-c") 'mc/edit-lines)
-  ;; When you want to add multiple cursors not based on continuous lines, but based on keywords in the buffer, use:
+  ;; When you want to add multiple cursors not based on continuous lines,
+  ;; but based on keywords in the buffer, use:
   (global-set-key (kbd "C->") 'mc/mark-next-like-this)
   (global-set-key (kbd "C-<") 'mc/mark-previous-like-this)
 )
@@ -131,7 +139,7 @@
 (add-to-list 'auto-mode-alist '("\\.yml\\'" . yaml-mode))
 ;; This makes enter auto-indent in yaml mode.
 (add-hook 'yaml-mode-hook
-          '(lambda ()
+          #'(lambda ()
              (define-key yaml-mode-map "\C-m" 'newline-and-indent)))
 ;; Proper indent.
 (setq yaml-indent-offset 4)
@@ -139,6 +147,7 @@
 ;; Never use tabs for indentation.
 (setq-default indent-tabs-mode nil)
 ;; Display tabs in red.
+(defvar whitespace-style)
 (setq whitespace-style '(face trailing tabs))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
@@ -173,7 +182,7 @@
 (add-hook 'prog-mode-hook #'hs-minor-mode)
 ;; (add-hook 'yaml-mode-hook #'hs-minor-mode) ;; It doesn't work in yaml mode. :(
 (add-hook 'hs-minor-mode-hook
-          '(lambda ()
+          #'(lambda ()
              ;; Blocks of code.
              (define-key hs-minor-mode-map (kbd "S-<left>") 'hs-hide-block)
              (define-key hs-minor-mode-map (kbd "S-<right>") 'hs-show-block)
@@ -201,7 +210,7 @@
 ;; (global-set-key (kbd "C-'") nil)
 (global-set-key (kbd "C-'") 'other-window)
 (defun prev-window ()
-  "The reverse of 'other-window', go back one window."
+  "The reverse of \"other-window\", go back one window."
   (interactive)
   (other-window -1))
 (global-set-key (kbd "C-\"") 'prev-window)
@@ -331,6 +340,7 @@
 
 ;; Always highlight the current line. In a visible color.
 (global-hl-line-mode t)
+(defvar hl-line-face)
 (set-face-background hl-line-face "gray30")
 
 ;; Projectile is for finding files in a project/managing projects.
