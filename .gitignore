@@ -18,3 +18,4 @@ straight
 bookmarks
 org-roam.db
 flycheck_ml.el
+tree-sitter-module

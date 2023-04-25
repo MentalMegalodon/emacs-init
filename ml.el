@@ -57,15 +57,15 @@
 (ido-vertical-mode 1)
 
 ;; The important stuff for getting code highlighting, autocomplete, etc.
-(use-package lsp-mode)
+;; (use-package lsp-mode)
 
 ;; Actually use lsp.
-(add-hook 'prog-mode-hook #'lsp)
+;; (add-hook 'prog-mode-hook #'lsp)
 
 ;; Add a ui for language/completion stuff.
-(use-package lsp-ui
-  :bind ("C-?" . lsp-ui-doc-glance)
-  :config (setq lsp-ui-doc-position 'at-point))
+;; (use-package lsp-ui
+;;   :bind ("C-?" . lsp-ui-doc-glance)
+;;   :config (setq lsp-ui-doc-position 'at-point))
 
 ;; This gives nice popups for auto-complete on variables.
 ;; idle-delay nil means it only does it when I ask it to with M-/.
@@ -75,22 +75,18 @@
 
 ;; Rust formatting.
 (use-package rust-mode)
-(add-hook 'rust-mode-hook 'lsp)
+;; (add-hook 'rust-mode-hook 'lsp)
 
 ;; Needed for php.
 (use-package yasnippet)
 
 ;; php formatting.
 (use-package php-mode)
-;; Phpactor not found. I couldn't resolve this error.
-;; (use-package phpactor :ensure t)
-;; (use-package company-phpactor :ensure t)
-(add-hook 'php-mode-hook 'lsp)
-;; (phpactor-install-or-update)
+;; (add-hook 'php-mode-hook 'lsp)
 
 ;; Dockerfile formatting.
 (use-package dockerfile-mode)
-(add-hook 'dockerfile-mode-hook 'lsp)
+;; (add-hook 'dockerfile-mode-hook 'lsp)
 (add-to-list 'auto-mode-alist '("Dockerfile-[a-zA-Z]*" . dockerfile-mode))
 
 ;; Typescript mode.
@@ -163,20 +159,22 @@
 ;; (global-set-key (kbd "C-{") 'indent-rigidly)
 ;; (global-set-key (kbd "C-}") (lambda () (interactive) (indent-rigidly -4)))
 
-;; ;; Tree sitter (which should be built into emacs in the next full version) supports syntax highlighting, etc.,
-;; ;; for most programming languages.
-;; (use-package tree-sitter
-;;   :ensure t
-;;   :config
-;;   ;; activate tree-sitter on any buffer containing code for which it has a parser available
-;;   (global-tree-sitter-mode)
-;;   ;; you can easily see the difference tree-sitter-hl-mode makes for python, ts or tsx
-;;   ;; by switching on and off
-;;   (add-hook 'tree-sitter-after-on-hook #'tree-sitter-hl-mode))
+;; Tree-sitter, using the built-in Emacs package.
+(require 'treesit)
+;; The directory where I compiled the language definitions.
+;; To get these, run the following commands from .emacs.d:
+;;   git clone https://github.com/casouri/tree-sitter-module.git
+;;   cd tree-sitter-module
+;;   ./batch.sh
+(setq treesit-extra-load-path '("~/.emacs.d/tree-sitter-module/dist"))
 
-;; (use-package tree-sitter-langs
-;;   :ensure t
-;;   :after tree-sitter)
+;; Automatically use treesit modes when available.
+;; (Prefer python-ts-mode over python-mode)
+(use-package treesit-auto
+  :config
+  (global-treesit-auto-mode))
+
+(use-package eglot)
 
 ;; Hideshow. Always when programming.
 (add-hook 'prog-mode-hook #'hs-minor-mode)
@@ -245,8 +243,8 @@
 ;; Enables C-; binding to jump around to symbols and refactor a file.
 (use-package iedit)
 
-;; Does git shit.
-(use-package magit)
+;; Does git shit. Non-functional with emacs-29 right now.
+;; (use-package magit)
 
 ;; Tell mac OS to shut up about ls dired not working.
 (when (string= system-type "darwin")
@@ -436,5 +434,85 @@
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
+ '(connection-local-criteria-alist
+   '(((:application tramp :machine "localhost")
+      tramp-connection-local-darwin-ps-profile)
+     ((:application tramp :machine "00XZLVDQ")
+      tramp-connection-local-darwin-ps-profile)
+     ((:application tramp)
+      tramp-connection-local-default-system-profile tramp-connection-local-default-shell-profile)))
+ '(connection-local-profile-alist
+   '((tramp-connection-local-darwin-ps-profile
+      (tramp-process-attributes-ps-args "-acxww" "-o" "pid,uid,user,gid,comm=abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ" "-o" "state=abcde" "-o" "ppid,pgid,sess,tty,tpgid,minflt,majflt,time,pri,nice,vsz,rss,etime,pcpu,pmem,args")
+      (tramp-process-attributes-ps-format
+       (pid . number)
+       (euid . number)
+       (user . string)
+       (egid . number)
+       (comm . 52)
+       (state . 5)
+       (ppid . number)
+       (pgrp . number)
+       (sess . number)
+       (ttname . string)
+       (tpgid . number)
+       (minflt . number)
+       (majflt . number)
+       (time . tramp-ps-time)
+       (pri . number)
+       (nice . number)
+       (vsize . number)
+       (rss . number)
+       (etime . tramp-ps-time)
+       (pcpu . number)
+       (pmem . number)
+       (args)))
+     (tramp-connection-local-busybox-ps-profile
+      (tramp-process-attributes-ps-args "-o" "pid,user,group,comm=abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ" "-o" "stat=abcde" "-o" "ppid,pgid,tty,time,nice,etime,args")
+      (tramp-process-attributes-ps-format
+       (pid . number)
+       (user . string)
+       (group . string)
+       (comm . 52)
+       (state . 5)
+       (ppid . number)
+       (pgrp . number)
+       (ttname . string)
+       (time . tramp-ps-time)
+       (nice . number)
+       (etime . tramp-ps-time)
+       (args)))
+     (tramp-connection-local-bsd-ps-profile
+      (tramp-process-attributes-ps-args "-acxww" "-o" "pid,euid,user,egid,egroup,comm=abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ" "-o" "state,ppid,pgid,sid,tty,tpgid,minflt,majflt,time,pri,nice,vsz,rss,etimes,pcpu,pmem,args")
+      (tramp-process-attributes-ps-format
+       (pid . number)
+       (euid . number)
+       (user . string)
+       (egid . number)
+       (group . string)
+       (comm . 52)
+       (state . string)
+       (ppid . number)
+       (pgrp . number)
+       (sess . number)
+       (ttname . string)
+       (tpgid . number)
+       (minflt . number)
+       (majflt . number)
+       (time . tramp-ps-time)
+       (pri . number)
+       (nice . number)
+       (vsize . number)
+       (rss . number)
+       (etime . number)
+       (pcpu . number)
+       (pmem . number)
+       (args)))
+     (tramp-connection-local-default-shell-profile
+      (shell-file-name . "/bin/sh")
+      (shell-command-switch . "-c"))
+     (tramp-connection-local-default-system-profile
+      (path-separator . ":")
+      (null-device . "/dev/null"))))
  '(package-selected-packages
-   '(org-roam exec-path-from-shell uuidgen magit projectile-ripgrep projectile flycheck vterm iedit string-inflection move-text highlight-indent-guides yaml-mode jenkinsfile-mode multiple-cursors typescript-mode dockerfile-mode company-phpactor phpactor php-mode yasnippet rust-mode company lsp-ui lsp-mode ido-vertical-mode rainbow-delimiters exotica-theme use-package)))
+   '(treesit treesit-auto tree-sitter-langs tree-sitter org-roam exec-path-from-shell uuidgen magit projectile-ripgrep projectile flycheck vterm iedit string-inflection move-text highlight-indent-guides yaml-mode jenkinsfile-mode multiple-cursors typescript-mode dockerfile-mode company-phpactor phpactor php-mode yasnippet rust-mode company lsp-ui lsp-mode ido-vertical-mode rainbow-delimiters exotica-theme use-package)))
