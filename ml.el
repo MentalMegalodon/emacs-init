@@ -195,6 +195,10 @@
 (add-hook 'yaml-mode-hook 'highlight-indent-guides-mode)
 (setq highlight-indent-guides-method 'character) ;; solid line
 (setq highlight-indent-guides-responsive 'top)   ;; highlight current indent level.
+;; These fix it for my theme and emacs-29, where the relative coloring
+;; no longer works.
+(set-face-foreground 'highlight-indent-guides-character-face "dimgray")
+(set-face-foreground 'highlight-indent-guides-top-character-face "gray")
 
 ;; Moving line or selection up or down with M-p and M-n.
 (use-package move-text)
