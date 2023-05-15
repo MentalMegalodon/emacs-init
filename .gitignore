@@ -19,3 +19,5 @@ bookmarks
 org-roam.db
 flycheck_ml.el
 tree-sitter-module
+/.DS_Store
+/tree-sitter/
