@@ -61,7 +61,8 @@
 
 ;; Actually use lsp.
 (add-hook 'prog-mode-hook #'lsp)
-;; Failed attempt to exclude emacs-lisp files to get rid of warning.
+;; Failed attempts to exclude emacs-lisp files to get rid of warning.
+;; (remove-hook 'emacs-lisp-mode-hook 'lsp t)
 ;; (add-hook 'emacs-lisp-mode-hook (lambda () (lsp -1)))
 
 ;; Add a ui for language/completion stuff.
@@ -241,7 +242,9 @@
   (defun turn-off-chrome ()
     (setq-local global-hl-line-mode nil)
     (display-line-numbers-mode -1)
-    (setq show-trailing-whitespace nil))
+    (setq show-trailing-whitespace nil)
+    ;; Allow longer command line history.
+    (setq vterm-max-scrollback 100000))
   :hook (vterm-mode . turn-off-chrome))
 
 (defun my-comint-init ()
@@ -317,6 +320,10 @@
 (projectile-mode +1)
 (define-key projectile-mode-map (kbd "s-p") 'projectile-command-map)
 (use-package projectile-ripgrep)
+;; Sort project files by recent buffers then recently opened files.
+(setq projectile-sort-order 'recently-active)
+;; Keep current project in list
+(setq projectile-current-project-on-switch 'keep)
 
 ;; Tell emacs where to find projects.
 (setq projectile-project-search-path '("~/atg"))
@@ -367,7 +374,7 @@
 (other-window 1)
 (vterm2)
 (other-window 1)
-( vterm3)
+(vterm3)
 (other-window 1)
 
 (defun highlight-old-years ()
