@@ -101,8 +101,9 @@
 )
 
 ;; I don't know why I need this section. auto-mode-alist should have them already.
-;; Recognize .yml files as .yaml files.
+;; Recognize .y(a)ml files as .yaml files.
 (add-to-list 'auto-mode-alist '("\\.yml\\'" . yaml-ts-mode))
+(add-to-list 'auto-mode-alist '("\\.yaml\\'" . yaml-ts-mode))
 ;; and .rs mode files as rust.
 (add-to-list 'auto-mode-alist '("\\.rs\\'" . rust-ts-mode))
 ;; Dockerfile formatting.
@@ -242,9 +243,11 @@
   (defun turn-off-chrome ()
     (setq-local global-hl-line-mode nil)
     (display-line-numbers-mode -1)
-    (setq show-trailing-whitespace nil)
-    ;; Allow longer command line history.
-    (setq vterm-max-scrollback 100000))
+    (setq show-trailing-whitespace nil))
+  ;; Allow longer command line history.
+  (setq vterm-max-scrollback 100000)
+  ;; M-x cls as shortcut to clear terminal.
+  (defalias 'cls 'vterm-clear)
   :hook (vterm-mode . turn-off-chrome))
 
 (defun my-comint-init ()
