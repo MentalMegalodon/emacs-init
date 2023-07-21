@@ -57,7 +57,11 @@
 (ido-vertical-mode 1)
 
 ;; The important stuff for getting code highlighting, autocomplete, etc.
-(use-package lsp-mode)
+(use-package lsp-mode
+  :defines lsp-headerline-breadcrumb-icons-enable
+  ;; Get rid of the large ugly language icons in the headerline.
+  :config (setq lsp-headerline-breadcrumb-icons-enable nil)
+  )
 
 ;; Actually use lsp.
 (add-hook 'prog-mode-hook #'lsp)
@@ -69,6 +73,10 @@
 (use-package lsp-ui
   :bind ("C-?" . lsp-ui-doc-glance)
   :config (setq lsp-ui-doc-position 'at-point))
+
+;; I was unable to get lsp-java working with lsp-mode,
+;; so use built-in eglot instead.
+(add-hook 'java-mode-hook 'eglot-ensure)
 
 ;; This gives nice popups for auto-complete on variables.
 ;; idle-delay nil means it only does it when I ask it to with M-/.
@@ -107,7 +115,8 @@
 ;; and .rs mode files as rust.
 (add-to-list 'auto-mode-alist '("\\.rs\\'" . rust-ts-mode))
 ;; Dockerfile formatting.
-(add-to-list 'auto-mode-alist '("Dockerfile-[a-zA-Z]*" . dockerfile-ts-mode))'
+(add-to-list 'auto-mode-alist '("Dockerfile" . dockerfile-ts-mode))
+(add-to-list 'auto-mode-alist '("Dockerfile-[a-zA-Z]*" . dockerfile-ts-mode))
 ;; .ts files are typescript.
 (add-to-list 'auto-mode-alist '("\\.ts\\'" . typescript-ts-mode))
 
@@ -122,7 +131,9 @@
 
 ;; Never use tabs for indentation.
 (setq-default indent-tabs-mode nil)
-;; Display tabs in red.
+;; Use 2 spaces for javascript indentation.
+(setq js-indent-level 2)
+;; Display tabs and trailing spaces in red.
 (defvar whitespace-style)
 (setq whitespace-style '(face trailing tabs))
 (custom-set-faces
@@ -494,4 +505,4 @@
       (path-separator . ":")
       (null-device . "/dev/null"))))
  '(package-selected-packages
-   '(magit lsp-ui lsp-mode emacsql-sqlite exec-path-from-shell iedit yasnippet vterm multiple-cursors ido-vertical-mode string-inflection tree-sitter-langs uuidgen use-package treesit-auto flycheck projectile-ripgrep company-phpactor php-mode jenkinsfile-mode org-roam rainbow-delimiters move-text highlight-indent-guides exotica-theme)))
+   '(lsp-java magit lsp-ui lsp-mode emacsql-sqlite exec-path-from-shell iedit yasnippet vterm multiple-cursors ido-vertical-mode string-inflection tree-sitter-langs uuidgen use-package treesit-auto flycheck projectile-ripgrep company-phpactor php-mode jenkinsfile-mode org-roam rainbow-delimiters move-text highlight-indent-guides exotica-theme)))
