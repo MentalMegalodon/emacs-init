@@ -505,4 +505,4 @@
       (path-separator . ":")
       (null-device . "/dev/null"))))
  '(package-selected-packages
-   '(lsp-java magit lsp-ui lsp-mode emacsql-sqlite exec-path-from-shell iedit yasnippet vterm multiple-cursors ido-vertical-mode string-inflection tree-sitter-langs uuidgen use-package treesit-auto flycheck projectile-ripgrep company-phpactor php-mode jenkinsfile-mode org-roam rainbow-delimiters move-text highlight-indent-guides exotica-theme)))
+   '(magit lsp-ui lsp-mode emacsql-sqlite exec-path-from-shell iedit yasnippet vterm multiple-cursors ido-vertical-mode string-inflection tree-sitter-langs uuidgen use-package treesit-auto flycheck projectile-ripgrep company-phpactor php-mode jenkinsfile-mode org-roam rainbow-delimiters move-text highlight-indent-guides exotica-theme)))
