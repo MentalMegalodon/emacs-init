@@ -131,8 +131,12 @@
 
 ;; Never use tabs for indentation.
 (setq-default indent-tabs-mode nil)
-;; Use 2 spaces for javascript indentation.
-(setq js-indent-level 2)
+
+;; Intelligently guess tab sizing.
+(use-package dtrt-indent)
+(dtrt-indent-global-mode)
+;; ;; Use 2 spaces for javascript indentation.
+;; (setq js-indent-level 2)
 ;; Display tabs and trailing spaces in red.
 (defvar whitespace-style)
 (setq whitespace-style '(face trailing tabs))
@@ -505,4 +509,4 @@
       (path-separator . ":")
       (null-device . "/dev/null"))))
  '(package-selected-packages
-   '(magit lsp-ui lsp-mode emacsql-sqlite exec-path-from-shell iedit yasnippet vterm multiple-cursors ido-vertical-mode string-inflection tree-sitter-langs uuidgen use-package treesit-auto flycheck projectile-ripgrep company-phpactor php-mode jenkinsfile-mode org-roam rainbow-delimiters move-text highlight-indent-guides exotica-theme)))
+   '(dtrt-indent magit lsp-ui lsp-mode emacsql-sqlite exec-path-from-shell iedit yasnippet vterm multiple-cursors ido-vertical-mode string-inflection tree-sitter-langs uuidgen use-package treesit-auto flycheck projectile-ripgrep company-phpactor php-mode jenkinsfile-mode org-roam rainbow-delimiters move-text highlight-indent-guides exotica-theme)))
