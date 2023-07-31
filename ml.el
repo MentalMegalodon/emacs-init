@@ -48,6 +48,9 @@
 ;; Give two newlines between bracket pairs with enter.
 (setq electric-pair-open-newline-between-pairs t)
 
+;; Show opening parenthesis context in minibuffer when it's offscreen.
+(setq show-paren-context-when-offscreen t)
+
 ;; Smart matching for opening files/directories.
 (use-package ido)
 (setq ido-enable-flex-matching t)
@@ -135,8 +138,6 @@
 ;; Intelligently guess tab sizing.
 (use-package dtrt-indent)
 (dtrt-indent-global-mode)
-;; ;; Use 2 spaces for javascript indentation.
-;; (setq js-indent-level 2)
 ;; Display tabs and trailing spaces in red.
 (defvar whitespace-style)
 (setq whitespace-style '(face trailing tabs))
@@ -196,6 +197,9 @@
 (global-set-key (kbd "M-p") 'move-text-up)
 (global-set-key (kbd "M-n") 'move-text-down)
 
+;; Shortcut for duplicating selected region.
+(global-set-key (kbd "C-x j") #'duplicate-dwim)
+
 (global-set-key (kbd "M-<up>") 'backward-paragraph)
 (global-set-key (kbd "M-<down>") 'forward-paragraph)
 
@@ -211,6 +215,8 @@
 
 ;; Fast access to kill buffer.
 (global-set-key (kbd "<f4>") 'kill-buffer)
+
+(global-set-key (kbd "C-x C-r") 'restart-emacs)
 
 ;; When C-k at beginning of line, kill/yank the newline too.
 (setq kill-whole-line t)
