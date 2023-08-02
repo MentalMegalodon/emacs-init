@@ -132,6 +132,11 @@
 ;; php formatting.
 (use-package php-mode)
 
+;; Scala.
+(use-package scala-mode
+  :interpreter
+  ("scala" . scala-mode))
+
 ;; Never use tabs for indentation.
 (setq-default indent-tabs-mode nil)
 
@@ -515,4 +520,4 @@
       (path-separator . ":")
       (null-device . "/dev/null"))))
  '(package-selected-packages
-   '(dtrt-indent magit lsp-ui lsp-mode emacsql-sqlite exec-path-from-shell iedit yasnippet vterm multiple-cursors ido-vertical-mode string-inflection tree-sitter-langs uuidgen use-package treesit-auto flycheck projectile-ripgrep company-phpactor php-mode jenkinsfile-mode org-roam rainbow-delimiters move-text highlight-indent-guides exotica-theme)))
+   '(scala-mode dtrt-indent magit lsp-ui lsp-mode emacsql-sqlite exec-path-from-shell iedit yasnippet vterm multiple-cursors ido-vertical-mode string-inflection tree-sitter-langs uuidgen use-package treesit-auto flycheck projectile-ripgrep company-phpactor php-mode jenkinsfile-mode org-roam rainbow-delimiters move-text highlight-indent-guides exotica-theme)))
