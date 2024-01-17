@@ -48,6 +48,10 @@
 ;; Give two newlines between bracket pairs with enter.
 (setq electric-pair-open-newline-between-pairs t)
 
+;; Package to allow me to surround with quotes or change quote types.
+(use-package embrace)
+(global-set-key (kbd "C-,") #'embrace-commander)
+
 ;; Show opening parenthesis context in minibuffer when it's offscreen.
 (setq show-paren-context-when-offscreen t)
 
@@ -75,11 +79,26 @@
 ;; Add a ui for language/completion stuff.
 (use-package lsp-ui
   :bind ("C-?" . lsp-ui-doc-glance)
-  :config (setq lsp-ui-doc-position 'at-point))
+  :config (setq lsp-ui-doc-position 'at-point)
+          (setq lsp-ui-sideline-enable nil)
+  )
 
 ;; I was unable to get lsp-java working with lsp-mode,
 ;; so use built-in eglot instead.
 (add-hook 'java-mode-hook 'eglot-ensure)
+
+;; ;; Lets try doing everything with eglot!
+;; (add-hook 'prog-mode-hook 'eglot-ensure)
+
+;; ;; Attempt to get python venv working so I can have an environment for a folder.
+;; (use-package pyvenv)
+
+;; LSP for python language server shit.
+(use-package lsp-pyright
+  :ensure t
+  :hook (python-mode . (lambda ()
+                          (require 'lsp-pyright)
+                          (lsp))))
 
 ;; This gives nice popups for auto-complete on variables.
 ;; idle-delay nil means it only does it when I ask it to with M-/.
@@ -440,14 +459,18 @@
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
  '(connection-local-criteria-alist
-   '(((:application tramp :machine "localhost")
+   '(((:application eshell)
+      eshell-connection-default-profile)
+     ((:application tramp :machine "localhost")
       tramp-connection-local-darwin-ps-profile)
      ((:application tramp :machine "00XZLVDQ")
       tramp-connection-local-darwin-ps-profile)
      ((:application tramp)
       tramp-connection-local-default-system-profile tramp-connection-local-default-shell-profile)))
  '(connection-local-profile-alist
-   '((tramp-connection-local-darwin-ps-profile
+   '((eshell-connection-default-profile
+      (eshell-path-env-list))
+     (tramp-connection-local-darwin-ps-profile
       (tramp-process-attributes-ps-args "-acxww" "-o" "pid,uid,user,gid,comm=abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ" "-o" "state=abcde" "-o" "ppid,pgid,sess,tty,tpgid,minflt,majflt,time,pri,nice,vsz,rss,etime,pcpu,pmem,args")
       (tramp-process-attributes-ps-format
        (pid . number)
@@ -520,4 +543,4 @@
       (path-separator . ":")
       (null-device . "/dev/null"))))
  '(package-selected-packages
-   '(scala-mode dtrt-indent magit lsp-ui lsp-mode emacsql-sqlite exec-path-from-shell iedit yasnippet vterm multiple-cursors ido-vertical-mode string-inflection tree-sitter-langs uuidgen use-package treesit-auto flycheck projectile-ripgrep company-phpactor php-mode jenkinsfile-mode org-roam rainbow-delimiters move-text highlight-indent-guides exotica-theme)))
+   '(embrace lsp-pyright pyvenv scala-mode dtrt-indent magit lsp-ui lsp-mode emacsql-sqlite exec-path-from-shell iedit yasnippet vterm multiple-cursors ido-vertical-mode string-inflection tree-sitter-langs uuidgen use-package treesit-auto flycheck projectile-ripgrep company-phpactor php-mode jenkinsfile-mode org-roam rainbow-delimiters move-text highlight-indent-guides exotica-theme)))
