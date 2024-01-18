@@ -352,7 +352,7 @@
 (use-package projectile-ripgrep)
 
 ;; Tell emacs where to find projects.
-(setq projectile-project-search-path '("~/atg"))
+(setq projectile-project-search-path '("~/code/rust"))
 (projectile-discover-projects-in-search-path)
 ;; This opens project picker automatically, but gets annoying.
 ;; (projectile-switch-project)
