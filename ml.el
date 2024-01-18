@@ -48,6 +48,13 @@
 ;; Give two newlines between bracket pairs with enter.
 (setq electric-pair-open-newline-between-pairs t)
 
+;; Package to allow me to surround with quotes or change quote types.
+(use-package embrace)
+(global-set-key (kbd "C-,") #'embrace-commander)
+
+;; Show opening parenthesis context in minibuffer when it's offscreen.
+(setq show-paren-context-when-offscreen t)
+
 ;; Smart matching for opening files/directories.
 (use-package ido)
 (setq ido-enable-flex-matching t)
@@ -57,51 +64,48 @@
 (ido-vertical-mode 1)
 
 ;; The important stuff for getting code highlighting, autocomplete, etc.
-;; (use-package lsp-mode)
+(use-package lsp-mode
+  :defines lsp-headerline-breadcrumb-icons-enable
+  ;; Get rid of the large ugly language icons in the headerline.
+  :config (setq lsp-headerline-breadcrumb-icons-enable nil)
+  )
 
 ;; Actually use lsp.
-;; (add-hook 'prog-mode-hook #'lsp)
+(add-hook 'prog-mode-hook #'lsp)
+;; Failed attempts to exclude emacs-lisp files to get rid of warning.
+;; (remove-hook 'emacs-lisp-mode-hook 'lsp t)
+;; (add-hook 'emacs-lisp-mode-hook (lambda () (lsp -1)))
 
 ;; Add a ui for language/completion stuff.
-;; (use-package lsp-ui
-;;   :bind ("C-?" . lsp-ui-doc-glance)
-;;   :config (setq lsp-ui-doc-position 'at-point))
+(use-package lsp-ui
+  :bind ("C-?" . lsp-ui-doc-glance)
+  :config (setq lsp-ui-doc-position 'at-point)
+          (setq lsp-ui-sideline-enable nil)
+  )
+
+;; I was unable to get lsp-java working with lsp-mode,
+;; so use built-in eglot instead.
+(add-hook 'java-mode-hook 'eglot-ensure)
+
+;; ;; Lets try doing everything with eglot!
+;; (add-hook 'prog-mode-hook 'eglot-ensure)
+
+;; ;; Attempt to get python venv working so I can have an environment for a folder.
+;; (use-package pyvenv)
+
+;; LSP for python language server shit.
+(use-package lsp-pyright
+  :ensure t
+  :hook (python-mode . (lambda ()
+                          (require 'lsp-pyright)
+                          (lsp))))
 
 ;; This gives nice popups for auto-complete on variables.
 ;; idle-delay nil means it only does it when I ask it to with M-/.
 (use-package company
   :bind ("M-/" . company-complete)
-  :config (setq company-idle-delay nil))
-
-;; Rust formatting.
-(use-package rust-mode)
-;; (add-hook 'rust-mode-hook 'lsp)
-
-;; Needed for php.
-(use-package yasnippet)
-
-;; php formatting.
-(use-package php-mode)
-;; (add-hook 'php-mode-hook 'lsp)
-
-;; Dockerfile formatting.
-(use-package dockerfile-mode)
-;; (add-hook 'dockerfile-mode-hook 'lsp)
-(add-to-list 'auto-mode-alist '("Dockerfile-[a-zA-Z]*" . dockerfile-mode))
-
-;; Typescript mode.
-(use-package typescript-mode
-  ;; Typescript should only be indented to 2.
-  :config (setq typescript-indent-level 2)
-  ;; Typescript on .tsx files.
-  (add-to-list 'auto-mode-alist '("\\.tsx\\'" . typescript-mode)))
-
-;; Json should only use 4? spaces for indenting.
-(use-package json-mode)
-(add-hook 'json-mode-hook
-          (lambda ()
-            (make-local-variable 'js-indent-level)
-            (setq js-indent-level 4)))
+  :config (setq company-idle-delay nil)
+  :hook (prog-mode . company-mode))
 ;; Non-functional attempt to make this prompt
 ;; for something to jump to definition of.
 (global-set-key (kbd "C-.") 'xref-find-apropos)
@@ -126,23 +130,39 @@
   (global-set-key (kbd "C-<") 'mc/mark-previous-like-this)
 )
 
+;; I don't know why I need this section. auto-mode-alist should have them already.
+;; Recognize .y(a)ml files as .yaml files.
+(add-to-list 'auto-mode-alist '("\\.yml\\'" . yaml-ts-mode))
+(add-to-list 'auto-mode-alist '("\\.yaml\\'" . yaml-ts-mode))
+;; and .rs mode files as rust.
+(add-to-list 'auto-mode-alist '("\\.rs\\'" . rust-ts-mode))
+;; Dockerfile formatting.
+(add-to-list 'auto-mode-alist '("Dockerfile" . dockerfile-ts-mode))
+(add-to-list 'auto-mode-alist '("Dockerfile-[a-zA-Z]*" . dockerfile-ts-mode))
+;; .ts files are typescript.
+(add-to-list 'auto-mode-alist '("\\.ts\\'" . typescript-ts-mode))
+
 ;; Jenkinsfiles should look nice.
 (use-package jenkinsfile-mode)
-(use-package groovy-mode)
 
-;; So should yaml/yml files.
-(use-package yaml-mode)
-(add-to-list 'auto-mode-alist '("\\.yml\\'" . yaml-mode))
-;; This makes enter auto-indent in yaml mode.
-(add-hook 'yaml-mode-hook
-          #'(lambda ()
-             (define-key yaml-mode-map "\C-m" 'newline-and-indent)))
-;; Proper indent.
-(setq yaml-indent-offset 4)
+;; Needed for php.
+(use-package yasnippet)
+
+;; php formatting.
+(use-package php-mode)
+
+;; Scala.
+(use-package scala-mode
+  :interpreter
+  ("scala" . scala-mode))
 
 ;; Never use tabs for indentation.
 (setq-default indent-tabs-mode nil)
-;; Display tabs in red.
+
+;; Intelligently guess tab sizing.
+(use-package dtrt-indent)
+(dtrt-indent-global-mode)
+;; Display tabs and trailing spaces in red.
 (defvar whitespace-style)
 (setq whitespace-style '(face trailing tabs))
 (custom-set-faces
@@ -154,10 +174,6 @@
 ;; Show extra whitespace that'll get deleted.
 (setq-default show-trailing-whitespace t)
 (add-hook 'prog-mode-hook 'whitespace-mode)
-
-;; My shoddy attempt at indent and dedent a block of code.
-;; (global-set-key (kbd "C-{") 'indent-rigidly)
-;; (global-set-key (kbd "C-}") (lambda () (interactive) (indent-rigidly -4)))
 
 ;; Tree-sitter, using the built-in Emacs package.
 (require 'treesit)
@@ -174,11 +190,8 @@
   :config
   (global-treesit-auto-mode))
 
-(use-package eglot)
-
 ;; Hideshow. Always when programming.
 (add-hook 'prog-mode-hook #'hs-minor-mode)
-;; (add-hook 'yaml-mode-hook #'hs-minor-mode) ;; It doesn't work in yaml mode. :(
 (add-hook 'hs-minor-mode-hook
           #'(lambda ()
              ;; Blocks of code.
@@ -190,26 +203,31 @@
              (define-key hs-minor-mode-map (kbd "C-S-<right>") 'hs-show-all)))
 
 ;; Same for highlighting indents.
-(use-package highlight-indent-guides)
-(add-hook 'prog-mode-hook 'highlight-indent-guides-mode)
-(add-hook 'yaml-mode-hook 'highlight-indent-guides-mode)
-(setq highlight-indent-guides-method 'character) ;; solid line
-(setq highlight-indent-guides-responsive 'top)   ;; highlight current indent level.
-;; These fix it for my theme and emacs-29, where the relative coloring
-;; no longer works.
-(set-face-foreground 'highlight-indent-guides-character-face "dimgray")
-(set-face-foreground 'highlight-indent-guides-top-character-face "gray")
+(use-package highlight-indent-guides
+  :hook
+  (prog-mode . highlight-indent-guides-mode)
+  (yaml-ts-mode . highlight-indent-guides-mode)
+  :init
+  (setq highlight-indent-guides-method 'character) ;; solid line
+  (setq highlight-indent-guides-responsive 'top)   ;; highlight current level.
+  (setq highlight-indent-guides-auto-enabled nil)  ;; Guess colors.
+  :custom-face
+  (highlight-indent-guides-character-face ((t (:foreground "dimgray"))))
+  (highlight-indent-guides-top-character-face ((t (:foreground "gray"))))
+  )
 
 ;; Moving line or selection up or down with M-p and M-n.
 (use-package move-text)
 (global-set-key (kbd "M-p") 'move-text-up)
 (global-set-key (kbd "M-n") 'move-text-down)
 
+;; Shortcut for duplicating selected region.
+(global-set-key (kbd "C-x j") #'duplicate-dwim)
+
 (global-set-key (kbd "M-<up>") 'backward-paragraph)
 (global-set-key (kbd "M-<down>") 'forward-paragraph)
 
 ;; Moving between windows/buffers.
-;; (global-set-key (kbd "C-'") nil)
 (global-set-key (kbd "C-'") 'other-window)
 (defun prev-window ()
   "The reverse of \"other-window\", go back one window."
@@ -221,6 +239,8 @@
 
 ;; Fast access to kill buffer.
 (global-set-key (kbd "<f4>") 'kill-buffer)
+
+(global-set-key (kbd "C-x C-r") 'restart-emacs)
 
 ;; When C-k at beginning of line, kill/yank the newline too.
 (setq kill-whole-line t)
@@ -247,8 +267,8 @@
 ;; Enables C-; binding to jump around to symbols and refactor a file.
 (use-package iedit)
 
-;; Does git shit. Non-functional with emacs-29 right now.
-;; (use-package magit)
+;; Does git shit.
+(use-package magit)
 
 ;; Tell mac OS to shut up about ls dired not working.
 (when (string= system-type "darwin")
@@ -269,6 +289,10 @@
     (setq-local global-hl-line-mode nil)
     (display-line-numbers-mode -1)
     (setq show-trailing-whitespace nil))
+  ;; Allow longer command line history.
+  (setq vterm-max-scrollback 100000)
+  ;; M-x cls as shortcut to clear terminal.
+  (defalias 'cls 'vterm-clear)
   :hook (vterm-mode . turn-off-chrome))
 
 (defun my-comint-init ()
@@ -281,12 +305,6 @@
   "Create a new shell with the specified BUFFER-NAME."
   (cond ((not (get-buffer buffer-name))
          (vterm)
-         ;; (make-local-variable 'comint-completion-addsuffix)
-         ;; (setq comint-completion-addsuffix (quote ("\\" . " ")))
-         ;; (setq tab-width 4)
-         ;; (setq comint-input-ring-size 100)
-         ;; (setq comint-input-ignoredups t)
-         ;; (setq comint-process-echoes t)
          (rename-buffer buffer-name))
         ;; if the buffer we want is in the current window, move to
         ;; the end
@@ -350,12 +368,14 @@
 (projectile-mode +1)
 (define-key projectile-mode-map (kbd "s-p") 'projectile-command-map)
 (use-package projectile-ripgrep)
+;; Sort project files by recent buffers then recently opened files.
+(setq projectile-sort-order 'recently-active)
+;; Keep current project in list
+(setq projectile-current-project-on-switch 'keep)
 
 ;; Tell emacs where to find projects.
 (setq projectile-project-search-path '("~/code/rust"))
 (projectile-discover-projects-in-search-path)
-;; This opens project picker automatically, but gets annoying.
-;; (projectile-switch-project)
 
 ;; This allows generating uuids for new projects.
 (use-package uuidgen)
@@ -402,7 +422,7 @@
 (other-window 1)
 (vterm2)
 (other-window 1)
-( vterm3)
+(vterm3)
 (other-window 1)
 
 (defun highlight-old-years ()
@@ -439,14 +459,18 @@
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
  '(connection-local-criteria-alist
-   '(((:application tramp :machine "localhost")
+   '(((:application eshell)
+      eshell-connection-default-profile)
+     ((:application tramp :machine "localhost")
       tramp-connection-local-darwin-ps-profile)
      ((:application tramp :machine "00XZLVDQ")
       tramp-connection-local-darwin-ps-profile)
      ((:application tramp)
       tramp-connection-local-default-system-profile tramp-connection-local-default-shell-profile)))
  '(connection-local-profile-alist
-   '((tramp-connection-local-darwin-ps-profile
+   '((eshell-connection-default-profile
+      (eshell-path-env-list))
+     (tramp-connection-local-darwin-ps-profile
       (tramp-process-attributes-ps-args "-acxww" "-o" "pid,uid,user,gid,comm=abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ" "-o" "state=abcde" "-o" "ppid,pgid,sess,tty,tpgid,minflt,majflt,time,pri,nice,vsz,rss,etime,pcpu,pmem,args")
       (tramp-process-attributes-ps-format
        (pid . number)
@@ -519,4 +543,4 @@
       (path-separator . ":")
       (null-device . "/dev/null"))))
  '(package-selected-packages
-   '(treesit treesit-auto tree-sitter-langs tree-sitter org-roam exec-path-from-shell uuidgen magit projectile-ripgrep projectile flycheck vterm iedit string-inflection move-text highlight-indent-guides yaml-mode jenkinsfile-mode multiple-cursors typescript-mode dockerfile-mode company-phpactor phpactor php-mode yasnippet rust-mode company lsp-ui lsp-mode ido-vertical-mode rainbow-delimiters exotica-theme use-package)))
+   '(embrace lsp-pyright pyvenv scala-mode dtrt-indent magit lsp-ui lsp-mode emacsql-sqlite exec-path-from-shell iedit yasnippet vterm multiple-cursors ido-vertical-mode string-inflection tree-sitter-langs uuidgen use-package treesit-auto flycheck projectile-ripgrep company-phpactor php-mode jenkinsfile-mode org-roam rainbow-delimiters move-text highlight-indent-guides exotica-theme)))
