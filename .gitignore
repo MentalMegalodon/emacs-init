@@ -23,3 +23,5 @@ tree-sitter-module
 /tree-sitter/
 .dap-breakpoints
 /games/
+eln-cache/
+session.*
