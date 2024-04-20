@@ -63,42 +63,50 @@
 (use-package ido-vertical-mode)
 (ido-vertical-mode 1)
 
-;; The important stuff for getting code highlighting, autocomplete, etc.
-(use-package lsp-mode
-  :defines lsp-headerline-breadcrumb-icons-enable
-  ;; Get rid of the large ugly language icons in the headerline.
-  :config (setq lsp-headerline-breadcrumb-icons-enable nil)
-  )
+;; ;; The important stuff for getting code highlighting, autocomplete, etc.
+;; (use-package lsp-mode
+;;   :defines lsp-headerline-breadcrumb-icons-enable
+;;   ;; Get rid of the large ugly language icons in the headerline.
+;;   :config (setq lsp-headerline-breadcrumb-icons-enable nil)
+;;   )
 
-;; Actually use lsp.
-(add-hook 'prog-mode-hook #'lsp)
-;; Failed attempts to exclude emacs-lisp files to get rid of warning.
-;; (remove-hook 'emacs-lisp-mode-hook 'lsp t)
-;; (add-hook 'emacs-lisp-mode-hook (lambda () (lsp -1)))
+;; ;; Actually use lsp.
+;; (add-hook 'prog-mode-hook #'lsp)
+;; ;; Failed attempts to exclude emacs-lisp files to get rid of warning.
+;; ;; (remove-hook 'emacs-lisp-mode-hook 'lsp t)
+;; ;; (add-hook 'emacs-lisp-mode-hook (lambda () (lsp -1)))
 
-;; Add a ui for language/completion stuff.
-(use-package lsp-ui
-  :bind ("C-?" . lsp-ui-doc-glance)
-  :config (setq lsp-ui-doc-position 'at-point)
-          (setq lsp-ui-sideline-enable nil)
-  )
+;; ;; Add a ui for language/completion stuff.
+;; (use-package lsp-ui
+;;   :bind ("C-?" . lsp-ui-doc-glance)
+;;   :config (setq lsp-ui-doc-position 'at-point)
+;;           (setq lsp-ui-sideline-enable nil)
+;;   )
 
-;; I was unable to get lsp-java working with lsp-mode,
-;; so use built-in eglot instead.
-(add-hook 'java-mode-hook 'eglot-ensure)
+;; ;; I was unable to get lsp-java working with lsp-mode,
+;; ;; so use built-in eglot instead.
+;; (add-hook 'java-mode-hook 'eglot-ensure)
 
-;; ;; Lets try doing everything with eglot!
-;; (add-hook 'prog-mode-hook 'eglot-ensure)
+;; Lets try doing everything with eglot!
+(add-hook 'prog-mode-hook 'eglot-ensure)
+
+;; Use the awesomefast ruff lsp for Python.
+(with-eval-after-load 'eglot
+   (add-to-list 'eglot-server-programs
+                '(python-mode . ("ruff-lsp"))))
+
+;; Auto-format python files with ruff when save.
+(use-package reformatter
+  :hook
+  (python-mode . ruff-format-on-save-mode)
+  (python-ts-mode . ruff-format-on-save-mode)
+  :config
+  (reformatter-define ruff-format
+    :program "ruff"
+    :args `("format" "--stdin-filename" ,buffer-file-name "-")))
 
 ;; ;; Attempt to get python venv working so I can have an environment for a folder.
 ;; (use-package pyvenv)
-
-;; LSP for python language server shit.
-(use-package lsp-pyright
-  :ensure t
-  :hook (python-mode . (lambda ()
-                          (require 'lsp-pyright)
-                          (lsp))))
 
 ;; This gives nice popups for auto-complete on variables.
 ;; idle-delay nil means it only does it when I ask it to with M-/.
@@ -459,4 +467,4 @@
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
  '(package-selected-packages
-   '(uuidgen projectile-ripgrep projectile flycheck vterm exec-path-from-shell magit iedit string-inflection move-text highlight-indent-guides treesit-auto dtrt-indent scala-mode php-mode yasnippet jenkinsfile-mode multiple-cursors company lsp-pyright lsp-ui lsp-mode ido-vertical-mode embrace rainbow-delimiters exotica-theme)))
+   '(reformatter yasnippet vterm uuidgen treesit-auto string-inflection scala-mode rainbow-delimiters projectile-ripgrep php-mode multiple-cursors move-text magit lsp-ui lsp-pyright jenkinsfile-mode iedit ido-vertical-mode highlight-indent-guides flycheck exotica-theme exec-path-from-shell embrace dtrt-indent company)))
