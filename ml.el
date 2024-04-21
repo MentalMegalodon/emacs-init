@@ -374,15 +374,15 @@
 ;; Projectile is for finding files in a project/managing projects.
 (use-package projectile)
 (projectile-mode +1)
-(define-key projectile-mode-map (kbd "s-p") 'projectile-command-map)
+(define-key projectile-mode-map (kbd "C-p") 'projectile-command-map)
 (use-package projectile-ripgrep)
 ;; Sort project files by recent buffers then recently opened files.
 (setq projectile-sort-order 'recently-active)
 ;; Keep current project in list
 (setq projectile-current-project-on-switch 'keep)
 
+(setq projectile-project-search-path '("~/code/"))
 ;; Tell emacs where to find projects.
-(setq projectile-project-search-path '("~/code/rust"))
 (projectile-discover-projects-in-search-path)
 
 ;; This allows generating uuids for new projects.
